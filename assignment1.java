@@ -1,119 +1,95 @@
-import java.util.*;
+package graph;
+import java.util.Arrays;
 
 class Edge implements Comparable<Edge> {
     int src, dest, weight;
-    
-    Edge(int src, int dest, int weight) {
+
+    public Edge(int src, int dest, int weight) {
         this.src = src;
         this.dest = dest;
         this.weight = weight;
     }
-    
+
     @Override
-    public int compareTo(Edge other) {
-        return this.weight - other.weight;
+    public int compareTo(Edge compareEdge) {
+        return this.weight - compareEdge.weight;
     }
 }
 
 class Graph {
-    int V, E; // Number of vertices and edges
-    Edge[] edges; // Array of edges
-    
-    Graph(int v, int e) {
-        V = v;
-        E = e;
-        edges = new Edge[E];
-        for (int i = 0; i < e; i++) {
-            edges[i] = new Edge(0, 0, 0);
-        }
-    }
-}
-
-class KruskalMST {
     int V, E;
-    Edge[] result;
-    
-    KruskalMST(int v, int e) {
+    Edge[] edges;
+
+    public Graph(int v, int e) {
         V = v;
         E = e;
-        result = new Edge[V - 1];
+        edges = new Edge[e]; // Fix here
+        for (int i = 0; i < e; ++i)
+            edges[i] = new Edge(0, 0, 0);
     }
-    
+
     int find(int[] parent, int i) {
         if (parent[i] == i)
             return i;
         return find(parent, parent[i]);
     }
-    
-    void union(int[] parent, int[] rank, int x, int y) {
+
+    void union(int[] parent, int x, int y) {
         int xRoot = find(parent, x);
         int yRoot = find(parent, y);
-        
-        if (rank[xRoot] < rank[yRoot])
-            parent[xRoot] = yRoot;
-        else if (rank[yRoot] < rank[xRoot])
-            parent[yRoot] = xRoot;
-        else {
-            parent[yRoot] = xRoot;
-            rank[xRoot]++;
-        }
+        parent[xRoot] = yRoot;
     }
-    
-    void kruskalMST(Graph graph) {
-        Edge[] edges = graph.edges;
+
+    void kruskalMST() {
+        Edge[] result = new Edge[V];
+        int e = 0;
+        int i = 0;
+        for (i = 0; i < V; ++i)
+            result[i] = new Edge(0, 0, 0);
+
         Arrays.sort(edges);
-        
+
         int[] parent = new int[V];
-        int[] rank = new int[V];
-        
-        for (int i = 0; i < V; i++) {
+        for (i = 0; i < V; ++i)
             parent[i] = i;
-            rank[i] = 0;
-        }
-        
-        int e = 0; // Index variable, used for result[]
-        int i = 0; // Index variable, used for sorted edges
-        
-        while (e < V - 1 && i < E) {
-            Edge next_edge = edges[i++];
-            
-            int x = find(parent, next_edge.src);
-            int y = find(parent, next_edge.dest);
-            
+
+        i = 0;
+        while (e < V - 1) {
+            Edge nextEdge = edges[i++];
+
+            int x = find(parent, nextEdge.src);
+            int y = find(parent, nextEdge.dest);
+
             if (x != y) {
-                result[e++] = next_edge;
-                union(parent, rank, x, y);
+                result[e++] = nextEdge;
+                union(parent, x, y);
             }
         }
-        
-        // Print the result
-        System.out.println("Edges of Minimum Spanning Tree:");
+
+        System.out.println("Minimum Spanning Tree:");
         for (i = 0; i < e; ++i)
-            System.out.println(result[i].src + " -- " + result[i].dest + " == " + result[i].weight);
+            System.out.println(result[i].src + " - " + result[i].dest + ": " + result[i].weight);
     }
 }
 
-public class Main {
+public class assignment1 {
     public static void main(String[] args) {
-        int V = 4; // Number of vertices
-        int E = 5; // Number of edges
+        int V = 4;  // Number of vertices
+        int E = 5;  // Number of edges
+
         Graph graph = new Graph(V, E);
-        
-        // Edge 0-1
-        graph.edges[0].src = 0;
-        graph.edges[0].dest = 1;
-        graph.edges[0].weight = 10;
-        
-        // Edge 0-2
-        graph.edges[1].src = 0;
-        graph.edges[1].dest = 2;
-        graph.edges[1].weight = 6;
-        
-        // Edge 0-3
-        graph.edges[2].src = 0;
-        graph.edges[2].dest = 3;
-        graph.edges[2].weight = 5;
-        
-        // Edge 1-3
-        graph.edges[3].src = 1;
-    
+
+        // Add edge 0-1
+        graph.edges[0] = new Edge(0, 1, 10);
+        // Add edge 0-2
+        graph.edges[1] = new Edge(0, 2, 6);
+        // Add edge 0-3
+        graph.edges[2] = new Edge(0, 3, 5);
+        // Add edge 1-3
+        graph.edges[3] = new Edge(1, 3, 15);
+        // Add edge 2-3
+        graph.edges[4] = new Edge(2, 3, 4);
+
+        graph.kruskalMST();
+    }
+}
